@@ -9,7 +9,7 @@ Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if(kIsWeb){
     await Firebase.initializeApp(
-      options: FirebaseOptions(
+      options: const FirebaseOptions(
         apiKey: "AIzaSyA8s4Q5b8s3gIyyixiRCL333UhITeg4-3M",
         appId: "1:648201197678:web:cc2e44ef277d4ea5036e7f", 
         messagingSenderId: "648201197678", 
@@ -34,10 +34,9 @@ class MyApp extends StatelessWidget {
           // Here, you can decide whether to show the LoginPage or HomePage based on user authentication
           child: LogInPage(),
         ),
+        '/login':(context) => LogInPage(),
         '/home': (context) => HomePage(),
       },
     );
   }
 }
-
-

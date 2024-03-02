@@ -1,10 +1,33 @@
+import 'package:firebase_app/features/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
 import 'package:firebase_app/features/user_auth/presentation/pages/home_page.dart';
 import 'package:firebase_app/features/user_auth/presentation/pages/sign_up_page.dart';
 import 'package:firebase_app/features/user_auth/presentation/widgets/form_container_widget.dart';
+import 'package:firebase_app/global/common/toast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class LogInPage extends StatelessWidget {
+class LogInPage extends StatefulWidget {
   const LogInPage({super.key});
+
+  @override
+  State<LogInPage> createState() => _LogInPageState();
+}
+
+class _LogInPageState extends State<LogInPage> {
+
+  bool _isSigning = false;
+  final FirebaseAuthServices _auth = FirebaseAuthServices();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -30,14 +53,16 @@ class LogInPage extends StatelessWidget {
               ),
               const SizedBox(height: 30),
           
-              const FormContainerWidget(
+              FormContainerWidget(
+                controller: _emailController,
                 hintText: 'Email',
                 isPasswordField: false,
               ),
           
               const SizedBox(height: 10),
           
-              const FormContainerWidget(
+              FormContainerWidget(
+                controller: _passwordController,
                 hintText: 'Password',
                 isPasswordField: true,
               ),
@@ -46,7 +71,7 @@ class LogInPage extends StatelessWidget {
 
               GestureDetector(
                 onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const HomePage()));
+                  _signIn();
                 },
                 child: Container(
                   width: double.infinity,
@@ -55,8 +80,10 @@ class LogInPage extends StatelessWidget {
                     color: Colors.blue,
                     borderRadius:BorderRadius.circular(10) 
                   ),
-                  child: const Center(
-                    child:  Text(
+                  child: Center(
+                    child: _isSigning ? const CircularProgressIndicator(
+                      color: Colors.white,) : 
+                    const Text(
                       'Login',
                       style: TextStyle(
                         color: Colors.black,
@@ -67,6 +94,43 @@ class LogInPage extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 30),
+
+              GestureDetector(
+                onTap: (){
+                  _signIn();
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius:BorderRadius.circular(10) 
+                  ),
+                  child: const Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(FontAwesomeIcons.google,color:Colors.white,),
+                        SizedBox(width: 5),
+                        Text(
+                          'Sign in with Google',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+
+
+
+
               const SizedBox(height: 20,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -103,4 +167,31 @@ class LogInPage extends StatelessWidget {
       )
     );
   }
+
+  void _signIn()async{
+
+    setState(() {
+      _isSigning = true;
+    });
+    
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    User? user  = await _auth.signInWithEmailAndPassword(email, password);
+
+    setState(() {
+      _isSigning = false;
+    });
+
+    if (user != null) {
+    showToast(message: "User is successfully Signed in");
+      Navigator.pushNamed(context,"/home");
+    } else {
+      showToast(message: "Some error happend");
+    }
+
+  }
+
+
+
 }
