@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
           child: LogInPage(),
         ),
         '/login':(context) => LogInPage(),
-        '/home': (context) => HomePage(),
+        '/home': (context) => Insertdata(),
       },
     );
   }
